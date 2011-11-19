@@ -53,13 +53,14 @@ canvas.newRect(0, 0, split, canvas.height).fillStyle = "#555";
 canvas.newRect(split, 0, split, canvas.height).fillStyle = "#AAA";
 
 var path = img("art/path.png");
+var bases = {"angel":img("art/angel_base.png"), "gargoyle":img("art/gargoyle_base.png")};
 
 for (i = 0; i < level.length; i++) {
 	var row = level[i];
 	for (j = 0; j < row.length; j++) {
 		var space = row[j];
 		if (space) {
-			canvas.newImage(i * 64, j * 64, path);
+			canvas.newImage(i * 64, j * 64, space.source?bases[space.source]:path);
 		}
 	}
 }
