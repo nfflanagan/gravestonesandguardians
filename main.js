@@ -64,4 +64,7 @@ for (i = 0; i < level.length; i++) {
 	}
 }
 
+alert(level[0][5].gargoyle);
+alert(level[15][5].angel);
+
 setInterval(function() {return canvas.draw();}, 33);
