@@ -32,7 +32,6 @@ var split = canvas.width / 2;
 canvas.newRect(0, 0, split, canvas.height).fillStyle = "#555";
 canvas.newRect(split, 0, split, canvas.height).fillStyle = "#AAA";
 
-var level = document.getElementById("level");
-alert(level.data.length);
+alert(level.length);
 
 setInterval(function() {return canvas.draw();}, 33);
