@@ -74,9 +74,7 @@ var time = night;
 function advancePawn(self) {
 	return function() {
 		if (self.where.destination == self.group) {
-			clearInterval(self.controller);
-			canvas.remove(self);
-			pawns.splice(pawns.indexOf(self), 1);
+			self.die();
 		} else {
 			var neighbors = self.where.neighbors();
 			var advances = new Array();
@@ -96,16 +94,23 @@ function attackPawn(self) {
 			var speed = 16;
 			var dX = self.target.x - self.x, dY =  self.target.y - self.y;
 			var distance = Math.sqrt(dX * dX + dY * dY);
-			var angle = math.atan2(dY, dX);
+			var angle = Math.atan2(dY, dX);
 			if (distance >= speed) {
 				self.x += Math.cos(angle) * speed;
 				self.y += Math.sin(angle) * speed;
 				return;
+			} else {
+				self.target.die();
 			}
 		}
-		clearInterval(self.controller);
-		canvas.remove(self);
+		self.die();
 	}
+}
+
+function pawnKill() {
+	var index = pawns.indexOf(this); if (index >= 0) pawns.splice(index, 1);
+	clearInterval(this.controller);
+	canvas.remove(this);
 }
 
 function newPawn(base, speed) {
@@ -119,6 +124,7 @@ function newPawn(base, speed) {
 			self.where = base;
 			pawns.push(self);
 			self.controller = setInterval(advancePawn(self), speed);
+			self.die = pawnKill;
 		} else {
 			var targets = new Array();
 			for (var i = 0; i < pawns.length; ++i) {
@@ -135,6 +141,7 @@ function newPawn(base, speed) {
 				self.group = base.source;
 				self.target = targets[Math.floor(Math.random()*targets.length)];
 				self.controller = setInterval(attackPawn(self), 33);
+				self.die = pawnKill;
 			}
 		}
 	}
@@ -153,7 +160,6 @@ function setBase(base, period, speed, spawnCount) {
 for (var row_index in level[0]) {	var row = level[0][row_index];
 	for (var space_index in row) {	var space = row[space_index];
 		if (space) {
-			if (space.source) alert(space.source);
 			new canvas.Image(space.h * 64, space.v * 64, space.source?bases[space.source]:path);
 			if (space.source) {
 				setBase(space, 2000, 500, 20);
