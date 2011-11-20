@@ -83,7 +83,7 @@ function advancePawn(self) {
 			var neighbors = self.where.neighbors();
 			var advances = new Array();
 			for (var index in neighbors) {	var n = neighbors[index];
-				if (n[self.group] < self.where[self.group]) advances.push(n);
+				if (!n.source && n[self.group] < self.where[self.group]) advances.push(n);
 			}
 			self.where = selectFrom(advances);
 			self.x = self.where.h * 64;
@@ -174,7 +174,7 @@ function setBase(base, period, speed, spawnCount) {
 	}
 }
 
-for (var row_index in level[0]) {	var row = level[0][row_index];
+for (var row_index in level[2]) {	var row = level[2][row_index];
 	for (var space_index in row) {	var space = row[space_index];
 		if (space) {
 			new canvas.Image(space.h * 64, space.v * 64, space.source?bases[space.source]:path);
