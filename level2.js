@@ -16,7 +16,7 @@
 	(new Space(0, 4, level)).source = "angel";
 
 	setDestination("gargoyle", level, 0, 5);
-	setDestination("angel", level, level.length -1, 9);
+	setDestination("angel", level, level.length -1, 5);
 
 })(newLevel(16, 10));
 

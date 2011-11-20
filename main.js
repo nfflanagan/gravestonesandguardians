@@ -31,13 +31,7 @@ function initDraw() {
 		}
 	}
 	canvas.remove = function(o) {
-		var shift = 0;
-		for (index in stack) {
-			if (stack[index] == o) {
-				stack = stack.slice(0, index).concat(stack.slice(index+1));
-				return o;
-			}
-		}
+		if (stack.splice(stack.indexOf(o), 1)) return o;
 	}
 	canvas.clear = function() {
 		this.getContext("2d").clearRect(0, 0, this.width, this.height);
@@ -89,7 +83,7 @@ function advancePawn(self) {
 	}
 }
 
-function newPawn(base) {
+function newPawn(base, speed) {
 	return function() {
 		if (base.spawnCount && !--base.spawnCount) {
 			clearInterval(base.controller);
@@ -97,13 +91,17 @@ function newPawn(base) {
 		var self = new canvas.Image(base.h * 64, base.v * 64, pawn[base.source])
 		self.group = base.source;
 		self.where = base;
-		self.controller = setInterval(advancePawn(self), 500);
+		self.controller = setInterval(advancePawn(self), speed);
 	}
 }
 
-function setBase(base, spawnCount) {
+function setBase(base, period, speed, spawnCount) {
 	base.spawnCount = spawnCount;
-	base.controller = setInterval(newPawn(base), 1000);
+	if (base.timeOut) {
+		setTimeout(function() {base.controller = setInterval(newPawn(base, speed), period);}, base.timeOut);
+	} else {
+		base.controller = setInterval(newPawn(base, speed), period);
+	}
 }
 
 for (var row_index in level[0]) {	var row = level[0][row_index];
@@ -111,7 +109,7 @@ for (var row_index in level[0]) {	var row = level[0][row_index];
 		if (space) {
 			new canvas.Image(space.h * 64, space.v * 64, space.source?bases[space.source]:path);
 			if (space.source) {
-				setBase(space);
+				setBase(space, 1500, 500, 20);
 			}
 		}
 	}

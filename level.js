@@ -1,9 +1,9 @@
 function setDestination(group, data, i, j) {
-	var d = data[i][j];
-	d.destination = group;
+	var dest = data[i][j];
+	dest.destination = group;
 	var n = 0;
-	d[group] = n++;
-	var spaces = new Array(d);
+	dest[group] = n++;
+	var spaces = new Array(dest);
 	while (spaces.length > 0) {
 		var borders = new Array();
 		for (var space_index in spaces) { var space = spaces[space_index];
