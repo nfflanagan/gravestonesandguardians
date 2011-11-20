@@ -55,3 +55,4 @@ function img(src) {
 	return self;
 }
 
+var canvas = initDraw();
