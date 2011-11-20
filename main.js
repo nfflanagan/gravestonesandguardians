@@ -195,7 +195,37 @@ for (var row_index in currentLevel) {	var row = currentLevel[row_index];
 	}
 }
 
+var blazons = {"no":img("art/X_Graphic.png"), "angel":baseImages.angel, "gargoyle":baseImages.gargoyle};
+var blazon;
+var sideChoosing;
+
+canvas.onmousemove = function(evt) {
+	var x = Math.floor(evt.clientX / 64), y = Math.floor(evt.clientY / 64);
+	if (blazon) {
+		canvas.remove(blazon);
+		blazon = undefined
+	}
+	if (time) return;
+	var badge = sideChoosing;
+	if ((badge == "angel" && x < currentLevel.length / 2) || (badge == "gargoyle" && x >= currentLevel.length / 2)) badge = "no";
+	if (!currentLevel[x][y]){
+		var neighbors = [currentLevel[x-1] && currentLevel[x-1][y], currentLevel[x][y - 1], currentLevel[x+1] && currentLevel[x+1][y], currentLevel[x][y+1]];
+		for (var i = 0; i < neighbors.length; ) {
+			if (neighbors[i] && !neighbors[i].source) {
+				++i;
+			} else {
+				neighbors.splice(i, 1);
+			}
+		}
+		if (neighbors.length == 0) badge = "no";
+	} else {
+		badge = "no";
+	}
+	blazon = new canvas.Image(x * 64, y * 64, blazons[badge]);
+}
+
 function addBase(side) {
+	sideChoosing = side;
 	canvas.onclick = function onClick(evt) {
 		var x = Math.floor(evt.clientX / 64), y = Math.floor(evt.clientY / 64);
 		if ((side == "angel" && x < (currentLevel.length + 1) / 2) || (side == "gargoyle" && x >= (currentLevel.length + 1) / 2)) return;
@@ -222,6 +252,7 @@ function addBase(side) {
 		space.source = side;
 		new canvas.Image(space.h * 64, space.v * 64, baseImages[space.source]);
 		setBase(space, 2000, 500);
+		sideChoosing = undefined;
 		canvas.onclick = null;
 		time = (side==night)? day: night;
 		setTimeout(swap, 30000);
