@@ -25,9 +25,9 @@
 	new Space(21, 20, level);
 	
 
-	new Space(4, 3, level).source = "gargoyle";
+	new Space(5, 5, level).source = "gargoyle";
 	
-	new Space(11, 7, level).source = "angel";
+	new Space(8, 9, level).source = "angel";
 	
 	setDestination("angel", level, 0, 5);
 	setDestination("gargoyle", level, level.length - 1, 5);
