@@ -22,8 +22,6 @@ function setDestination(group, data, i, j) {
 	}
 }
 
-var level = new Array();
-
 function Space(h, v, level) {
 	this.h = h;
 	this.v = v;
@@ -31,16 +29,28 @@ function Space(h, v, level) {
 	level[h][v] = this;
 }
 Space.prototype = {
-	"neighbors": function() {
+	"neighbors": function(steps) { steps || (steps = 1);
 		var level = this.level, h = this.h, v = this.v;
 		var n = new Array();
 		if (level[h-1] && level[h-1][v]) n.push(level[h-1][v]);
 		if (level[h][v - 1]) n.push(level[h][v - 1]);
 		if (level[h+1] && level[h+1][v]) n.push(level[h+1][v]);
 		if (level[h][v+1]) n.push(level[h][v+1]);
+		while (--steps) {
+			for (var i = 0; i < n.length; ++i) {
+				var spread = n[i].neighbors(1);
+				for (var j = 0; j < spread.length; ++j) {
+					if (n.indexOf(spread[j]) < 0) {
+						n.push(spread[j]);
+					}
+				}
+			}
+		}
 		return n;
 	}
 }
+
+var level = new Array();
 
 function newLevel(h, v) {
 	var self = new Array();

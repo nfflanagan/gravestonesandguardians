@@ -64,12 +64,19 @@ var path = img("art/path.png");
 var bases = {"angel":img("art/angel_base.png"), "gargoyle":img("art/gargoyle_base.png")};
 
 var pawn = {"angel":img("art/angel.png"), "gargoyle":img("art/gargoyle.png")};
+var pawns = new Array();
+
+var night = "gargoyle";
+var day = "angel";
+
+var time = night;
 
 function advancePawn(self) {
 	return function() {
 		if (self.where.destination == self.group) {
 			clearInterval(self.controller);
 			canvas.remove(self);
+			pawns.splice(pawns.indexOf(self), 1);
 		} else {
 			var neighbors = self.where.neighbors();
 			var advances = new Array();
@@ -85,13 +92,18 @@ function advancePawn(self) {
 
 function newPawn(base, speed) {
 	return function() {
-		if (base.spawnCount && !--base.spawnCount) {
-			clearInterval(base.controller);
+		if (time == base.source) {
+			if (base.spawnCount && !--base.spawnCount) {
+				clearInterval(base.controller);
+			}
+			var self = new canvas.Image(base.h * 64, base.v * 64, pawn[base.source]);
+			self.group = base.source;
+			self.where = base;
+			pawns.push(self);
+			self.controller = setInterval(advancePawn(self), speed);
+		} else {
+			
 		}
-		var self = new canvas.Image(base.h * 64, base.v * 64, pawn[base.source])
-		self.group = base.source;
-		self.where = base;
-		self.controller = setInterval(advancePawn(self), speed);
 	}
 }
 
@@ -107,9 +119,10 @@ function setBase(base, period, speed, spawnCount) {
 for (var row_index in level[0]) {	var row = level[0][row_index];
 	for (var space_index in row) {	var space = row[space_index];
 		if (space) {
+			if (space.source) alert(space.source);
 			new canvas.Image(space.h * 64, space.v * 64, space.source?bases[space.source]:path);
 			if (space.source) {
-				setBase(space, 1500, 500, 20);
+				setBase(space, 2000, 500, 20);
 			}
 		}
 	}

@@ -3,9 +3,11 @@
 		new Space(i, 5, level);
 	}
 
-	new Space(1, 6, level).source = "gargoyle";
-	level[1][6].timeOut = 500;
+	new Space(2, 6, level).source = "gargoyle";
+	level[2][6].timeOut = 1500;
 	new Space(5, 4, level).source = "gargoyle";
+	
+	new Space(12, 4, level).source = "angel";
 	
 	setDestination("angel", level, 0, 5);
 	setDestination("gargoyle", level, level.length - 1, 5);
