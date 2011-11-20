@@ -37,14 +37,16 @@ Space.prototype = {
 		if (level[h+1] && level[h+1][v]) n.push(level[h+1][v]);
 		if (level[h][v+1]) n.push(level[h][v+1]);
 		while (--steps) {
+			var borders = new Array();
 			for (var i = 0; i < n.length; ++i) {
 				var spread = n[i].neighbors(1);
 				for (var j = 0; j < spread.length; ++j) {
 					if (n.indexOf(spread[j]) < 0) {
-						n.push(spread[j]);
+						borders.push(spread[j]);
 					}
 				}
 			}
+			n = n.concat(borders);
 		}
 		return n;
 	}

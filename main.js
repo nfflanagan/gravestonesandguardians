@@ -71,6 +71,10 @@ var day = "angel";
 
 var time = night;
 
+function selectFrom(choices) {
+	return choices[Math.floor(Math.random()*choices.length)];
+}
+
 function advancePawn(self) {
 	return function() {
 		if (self.where.destination == self.group) {
@@ -81,7 +85,7 @@ function advancePawn(self) {
 			for (var index in neighbors) {	var n = neighbors[index];
 				if (n[self.group] < self.where[self.group]) advances.push(n);
 			}
-			self.where = advances[Math.floor(Math.random()*advances.length)];
+			self.where = selectFrom(advances);
 			self.x = self.where.h * 64;
 			self.y = self.where.v * 64;
 		}
@@ -101,6 +105,12 @@ function attackPawn(self) {
 				return;
 			} else {
 				self.target.die();
+			}
+		} else {
+			var targets = self.base.identifyTargets();
+			if (targets.length > 0) {
+				self.target = selectFrom(targets);
+				return;
 			}
 		}
 		self.die();
@@ -126,20 +136,12 @@ function newPawn(base, speed) {
 			self.controller = setInterval(advancePawn(self), speed);
 			self.die = pawnKill;
 		} else {
-			var targets = new Array();
-			for (var i = 0; i < pawns.length; ++i) {
-				if (base.domain.indexOf(pawns[i].where) >= 0) {
-					if (targets.length == 0 || targets[0].where[time] == pawns[i].where[time]) {
-						targets.push(pawns[i]);
-					} else if (targets[0].where[time] > pawns[i].where[time]) {
-						targets = new Array(pawns[i]);
-					}
-				}
-			}
+			var targets = base.identifyTargets();
 			if (targets.length > 0) {
 				var self = new canvas.Image(base.h * 64, base.v * 64, pawn[base.source]);
 				self.group = base.source;
-				self.target = targets[Math.floor(Math.random()*targets.length)];
+				self.base = base;
+				self.target = selectFrom(targets);
 				self.controller = setInterval(attackPawn(self), 33);
 				self.die = pawnKill;
 			}
@@ -147,9 +149,24 @@ function newPawn(base, speed) {
 	}
 }
 
+function identifyTargets() {
+	var targets = new Array();
+	for (var i = 0; i < pawns.length; ++i) {
+		if (this.domain.indexOf(pawns[i].where) >= 0) {
+			if (targets.length == 0 || targets[0].where[time] == pawns[i].where[time]) {
+				targets.push(pawns[i]);
+			} else if (targets[0].where[time] > pawns[i].where[time]) {
+				targets = new Array(pawns[i]);
+			}
+		}
+	}
+	return targets;
+}
+
 function setBase(base, period, speed, spawnCount) {
 	base.spawnCount = spawnCount;
 	base.domain = base.neighbors(2);
+	base.identifyTargets = identifyTargets;
 	if (base.timeOut) {
 		setTimeout(function() {base.controller = setInterval(newPawn(base, speed), period);}, base.timeOut);
 	} else {
