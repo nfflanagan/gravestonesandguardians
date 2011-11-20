@@ -40,9 +40,8 @@
 	new Space(14, 5, level);
 	new Space(15, 5, level);
 
-	new Space(4, 3, level).source = "gargoyle";
-	
-	new Space(11, 7, level).source = "angel";
+	new Space(0, 6, level).source = "gargoyle";
+	level[0][6].period = 1500;
 	
 	setDestination("angel", level, 0, 5);
 	setDestination("gargoyle", level, level.length - 1, 5);

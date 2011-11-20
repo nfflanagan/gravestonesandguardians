@@ -174,6 +174,7 @@ function identifyTargets() {
 }
 
 function setBase(base, period, speed, spawnCount) {
+	bases[base.source].push(base);
 	base.spawnCount = spawnCount;
 	base.domain = base.neighbors(2);
 	base.identifyTargets = identifyTargets;
@@ -189,7 +190,7 @@ for (var row_index in currentLevel) {	var row = currentLevel[row_index];
 		if (space) {
 			new canvas.Image(space.h * 64, space.v * 64, space.source?baseImages[space.source]:path);
 			if (space.source) {
-				setBase(space, 2000, 500);
+				setBase(space, space.period || 2000, 500);
 			}
 		}
 	}
@@ -199,11 +200,17 @@ var blazons = {"no":img("art/X_Graphic.png"), "angel":baseImages.angel, "gargoyl
 var blazon;
 var sideChoosing;
 
+var canvasMinX = 0, canvasMinY = 0;
+for (var cursor = canvas; cursor.offsetParent; cursor = cursor.offsetParent) {
+	canvasMinX += cursor.offsetLeft;
+	canvasMinY += cursor.offsetTop;
+}
+
 canvas.onmousemove = function(evt) {
-	var x = Math.floor(evt.clientX / 64), y = Math.floor(evt.clientY / 64);
+	var x = Math.floor((evt.pageX - canvasMinX) / 64), y = Math.floor((evt.pageY - canvasMinY) / 64);
 	if (blazon) {
 		canvas.remove(blazon);
-		blazon = undefined
+		blazon = undefined;
 	}
 	if (time) return;
 	var badge = sideChoosing;
@@ -224,12 +231,12 @@ canvas.onmousemove = function(evt) {
 	blazon = new canvas.Image(x * 64, y * 64, blazons[badge]);
 }
 
-function addBase(side) {
+function addBase(side, completion) {
 	sideChoosing = side;
 	canvas.onclick = function onClick(evt) {
-		var x = Math.floor(evt.clientX / 64), y = Math.floor(evt.clientY / 64);
+		var x = Math.floor((evt.pageX - canvasMinX) / 64), y = Math.floor((evt.pageY - canvasMinY) / 64);
 		if ((side == "angel" && x < (currentLevel.length + 1) / 2) || (side == "gargoyle" && x >= (currentLevel.length + 1) / 2)) return;
-		if (!currentLevel[x][y]){
+		if (!( currentLevel[x] && currentLevel[x][y])){
 			var neighbors = [currentLevel[x-1] && currentLevel[x-1][y], currentLevel[x][y - 1], currentLevel[x+1] && currentLevel[x+1][y], currentLevel[x][y+1]];
 			for (var i = 0; i < neighbors.length; ) {
 				if (neighbors[i] && !neighbors[i].source) {
@@ -254,9 +261,13 @@ function addBase(side) {
 		setBase(space, 2000, 500);
 		sideChoosing = undefined;
 		canvas.onclick = null;
-		time = (side==night)? day: night;
-		setTimeout(swap, 30000);
+		completion(side);
 	}
+}
+
+function startDay(side) {
+	time = (side==night)? day: night; 
+	setTimeout(swap, 30000);
 }
 
 function swap() {
@@ -265,14 +276,27 @@ function swap() {
 	while (pawns.length > 0) {
 		pawns[pawns.length - 1].die();
 	}
-	var basesLost = bases[(oldTime==night)? day: night].splice(0, Math.floor(damages / 5));
+	var newTime = (oldTime==night)? day: night
+	alert(damages);
+	var basesLost = bases[newTime].splice(0, Math.floor(damages / 5));
+	if (bases[newTime].length <= 0) {
+		return alert(oldTime + " won!")
+	} else {
+		for (var i = 0; i < basesLost.length; ++i) {
+			clearInterval(basesLost[i].controller);
+			canvas.remove(basesLost[i]);
+		}
+		damages = 0;
+	}
 	for (var i = 0; i < basesLost.length; ++i) {
 		clearInterval(basesLost[i].controller);
 		canvas.remove(basesLost[i]);
 	}
-	addBase(oldTime || day);
+	addBase(oldTime || day, startDay);
 }
 
-swap();
+alert("Gravestones & Gargoyles\n\nby Lance Perry \n& Nevin Flanagan");
+
+addBase(day, startDay);
 
 setInterval(function() {return canvas.draw();}, 33);
