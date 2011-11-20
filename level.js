@@ -6,20 +6,20 @@ function setDestination(group, data, i, j) {
 	var spaces = new Array(d);
 	while (spaces.length > 0) {
 		var borders = new Array();
-		for each (space in spaces) {
-			for each (neighbor in space.neighbors()) {
-				if (neighbor && !(neighbor[group]) {
+		for (var space_index in spaces) { var space = spaces[space_index];
+			var neighbors = space.neighbors();
+			for (var neighbor_index in neighbors) {	var neighbor = neighbors[neighbor_index];
+				if (neighbor && neighbor[group] == undefined) {
 					borders.push(neighbor);
 				}
 			}
 		}
-		for each (border in borders) {
+		for (var border_index in borders) {	var border = borders[border_index];
 			border[group] = n;
 		}
 		spaces = borders;
 		n++;
 	}
-
 }
 
 var level = new Array();
@@ -33,7 +33,12 @@ function Space(h, v, level) {
 Space.prototype = {
 	"neighbors": function() {
 		var level = this.level, h = this.h, v = this.v;
-		return [ level[h-1] && level[h-1][v], level[h][v - 1], level[h+1] && level[h+1][v], level[h][v+1] ];
+		var n = new Array();
+		if (level[h-1] && level[h-1][v]) n.push(level[h-1][v]);
+		if (level[h][v - 1]) n.push(level[h][v - 1]);
+		if (level[h+1] && level[h+1][v]) n.push(level[h+1][v]);
+		if (level[h][v+1]) n.push(level[h][v+1]);
+		return n;
 	}
 }
 
