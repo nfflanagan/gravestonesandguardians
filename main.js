@@ -55,10 +55,41 @@ canvas.newRect(split, 0, split, canvas.height).fillStyle = "#AAA";
 var path = img("art/path.png");
 var bases = {"angel":img("art/angel_base.png"), "gargoyle":img("art/gargoyle_base.png")};
 
+var pawn = {"angel":img("art/angel.png"), "gargoyle":img("art/gargoyle.png")};
+
+function setBase(base) {
+	var spawn
+	spawn = setInterval(
+		function() {
+			clearInterval(spawn);
+			var self = canvas.newImage(base.h * 64, base.v * 64, pawn[base.source])
+			self.group = base.source;
+			self.where = base;
+/*			self.controller = setInterval(
+				function() {
+					if (self.where.destination == self.group) {
+					} else {
+						var advances = [n for each (n in self.where.neighbors()) if (n && n[self.group] < self.where[self.group])];
+						self.where = advances[Math.floor(Math.random()*advances.length)];
+						self.x = self.where.h * 64;
+						self.y = self.where.v * 64;
+					}
+				},
+				500
+			)
+			*/
+		}, 
+		1000
+	)
+}
+
 for each (row in level[0]) {
 	for each (space in row) {
 		if (space) {
 			canvas.newImage(space.h * 64, space.v * 64, space.source?bases[space.source]:path);
+			if (space.source) {
+				setBase(space);
+			}
 		}
 	}
 }
